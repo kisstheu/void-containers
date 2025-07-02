@@ -48,8 +48,7 @@ RUN --mount=type=cache,sharing=locked,target=/target/var/cache/xbps,id=repocache
       qemu-user-aarch64 \
       binfmt-support \
       dosfstools \
-      e2fsprogs \
-      gcc-libs
+      e2fsprogs 
 
 # 7) 最终镜像 —— scratch + 直接 COPY
 FROM scratch AS void-glibc-full
