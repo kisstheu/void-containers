@@ -9,7 +9,6 @@ FROM --platform=${BUILDPLATFORM} alpine:3.22 AS bootstrap
 ARG TARGETPLATFORM
 ARG MIRROR=https://repo-ci.voidlinux.org
 ARG LIBC=glibc
-ARG TARGETARCH
 
 # 3) 安装基础工具并下载静态 xbps（musl 静态版）
 RUN apk add --no-cache ca-certificates curl \
@@ -32,7 +31,6 @@ FROM bootstrap AS install-full
 ARG TARGETPLATFORM
 ARG MIRROR
 ARG LIBC
-ARG TARGETARCH
 COPY --from=bootstrap /target /target
 RUN --mount=type=cache,sharing=locked,target=/target/var/cache/xbps,id=repocache \
   TARGETPLATFORM=${TARGETPLATFORM} \
@@ -42,7 +40,7 @@ RUN --mount=type=cache,sharing=locked,target=/target/var/cache/xbps,id=repocache
 # 7) 最终镜像——直接基于 install-full
 FROM install-full AS void-glibc-full
 WORKDIR /
-RUN cp -a /target/. / \
+RUN rsync -a /target/ / \
   && install -dm1777 /tmp \
   && xbps-reconfigure -fa \
   && rm -rf /var/cache/xbps/* /target
