@@ -36,7 +36,20 @@ RUN --mount=type=cache,sharing=locked,target=/target/var/cache/xbps,id=repocache
     TARGETPLATFORM=${TARGETPLATFORM} \
     . /bootstrap/setup.sh \
  && XBPS_TARGET_ARCH=$(uname -m) \
-    xbps-install -y -R "${REPO}" -r /target base-container
+    xbps-install -y -R "${REPO}" -r /target \
+      base-container \
+      bash \
+      make \
+      git \
+      kmod \
+      xz \
+      lzo \
+      qemu-user-arm \
+      qemu-user-aarch64 \
+      binfmt-support \
+      dosfstools \
+      e2fsprogs \
+      gcc-libs
 
 # 7) 最终镜像 —— scratch + 直接 COPY
 FROM scratch AS void-glibc-full
