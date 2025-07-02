@@ -14,7 +14,7 @@ ARG TARGETARCH
 # 3) 安装基础工具并下载静态 xbps（musl 静态版）
 RUN apk add --no-cache ca-certificates curl \
   && curl -fSL "${MIRROR}/static/xbps-static-static-0.59_5.$(uname -m)-musl.tar.xz" \
-     | tar -xJ -C /usr/local
+     | tar -xJ --strip-components=1 -C /
 
 # 4) 拷贝签名密钥和初始化脚本
 COPY keys/*         /target/var/db/xbps/keys/
