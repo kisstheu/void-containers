@@ -40,7 +40,8 @@ RUN --mount=type=cache,sharing=locked,target=/target/var/cache/xbps,id=repocache
 # 7) 最终镜像——直接基于 install-full
 FROM install-full AS void-glibc-full
 WORKDIR /
-RUN rsync -a /target/ / \
+# 使用 tar 复制防止文件冲突
+RUN tar -cf - -C /target . | tar -xf - -C / \
   && install -dm1777 /tmp \
   && xbps-reconfigure -fa \
   && rm -rf /var/cache/xbps/* /target
