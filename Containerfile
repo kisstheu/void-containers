@@ -8,10 +8,12 @@ FROM --platform=${BUILDPLATFORM} alpine:3.22 AS bootstrap
 # 2) 镜像源和 LIBC 默认为 glibc
 ARG MIRROR=https://repo-ci.voidlinux.org
 ARG LIBC=glibc
+ARG TARGETARCH
+ARG LIBC=glibc
 
 # 3) 安装基础工具并下载静态 xbps
 RUN apk add --no-cache ca-certificates curl \
-  && curl "${MIRROR}/static/xbps-static-static-0.59_5.$(uname -m)-${LIBC}.tar.xz" \
+  && curl -fSL "${MIRROR}/static/xbps-static-static-0.59_5.${TARGETARCH}-${LIBC}.tar.xz" \
      | tar -xJ -C /usr/local
 
 # 4) 拷贝签名密钥和初始化脚本
