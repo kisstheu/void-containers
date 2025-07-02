@@ -33,17 +33,19 @@ ARG MIRROR
 ARG LIBC
 COPY --from=bootstrap /target /target
 RUN --mount=type=cache,sharing=locked,target=/target/var/cache/xbps,id=repocache \
-  TARGETPLATFORM=${TARGETPLATFORM} \
-  . /bootstrap/setup.sh \
-  && XBPS_TARGET_ARCH=$(uname -m) xbps-install -y -R "${REPO}" -r /target base-container
+    TARGETPLATFORM=${TARGETPLATFORM} \
+    . /bootstrap/setup.sh \
+ && XBPS_TARGET_ARCH=$(uname -m) \
+    xbps-install -y -R "${REPO}" -r /target base-container
 
-# 7) 最终镜像——直接基于 install-full
-FROM install-full AS void-glibc-full
-WORKDIR /
-# 使用 tar 复制防止文件冲突
-RUN tar -cf - -C /target . | tar -xf - -C / \
-  && install -dm1777 /tmp \
-  && xbps-reconfigure -fa \
-  && rm -rf /var/cache/xbps/* /target
+# 7) 最终镜像 —— scratch + 直接 COPY
+FROM scratch AS void-glibc-full
+COPY --link --from=install-full /target/ /
+
+# 追加收尾：tmp 目录 / 清缓存 / 重配置
+RUN install -dm1777 /tmp \
+ && xbps-reconfigure -fa \
+ && rm -rf /var/cache/xbps/*
 
 CMD ["/bin/sh"]
+
